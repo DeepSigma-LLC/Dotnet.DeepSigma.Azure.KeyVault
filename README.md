@@ -331,19 +331,6 @@ var secretService = new SecretService(mockClient.Object);
 | [Microsoft.NET.Test.Sdk](https://www.nuget.org/packages/Microsoft.NET.Test.Sdk) | 18.3.0 |
 
 ---
-
-## Contributing
-
-1. Fork the repository.
-2. Create a feature branch: `git checkout -b feature/my-feature`.
-3. Commit your changes: `git commit -m 'Add my feature'`.
-4. Push to the branch: `git push origin feature/my-feature`.
-5. Open a pull request.
-
-Please ensure all existing tests pass and add tests for any new functionality.
-
----
-
 ## License
 
 This project is maintained by [DeepSigma LLC](https://github.com/DeepSigma-LLC).
