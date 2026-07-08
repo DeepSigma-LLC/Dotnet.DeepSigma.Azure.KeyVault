@@ -15,8 +15,8 @@ public interface IKeyService
     /// <param name="name">The name of the key.</param>
     /// <param name="version">The version of the key. If <see langword="null"/>, the latest version is retrieved.</param>
     /// <param name="cancellationToken">A token to cancel the operation.</param>
-    /// <returns>The <see cref="KeyVaultKey"/> with its key material and properties.</returns>
-    Task<KeyVaultKey> GetKeyAsync(string name, string? version = null, CancellationToken cancellationToken = default);
+    /// <returns>The <see cref="KeyVaultKey"/> with its key material and properties, or <see langword="null"/> if the key name is invalid.</returns>
+    Task<KeyVaultKey?> GetKeyAsync(string name, string? version = null, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Creates a new key of the specified type in the vault.
@@ -24,15 +24,15 @@ public interface IKeyService
     /// <param name="name">The name of the key to create.</param>
     /// <param name="keyType">The type of key to create (e.g., RSA, EC).</param>
     /// <param name="cancellationToken">A token to cancel the operation.</param>
-    /// <returns>The created <see cref="KeyVaultKey"/>.</returns>
-    Task<KeyVaultKey> CreateKeyAsync(string name, KeyType keyType, CancellationToken cancellationToken = default);
+    /// <returns>The created <see cref="KeyVaultKey"/>, or <see langword="null"/> if the key name is invalid.</returns>
+    Task<KeyVaultKey?> CreateKeyAsync(string name, KeyType keyType, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Creates a new RSA key in the vault with the specified options.
     /// </summary>
     /// <param name="options">The RSA key creation options, including key size.</param>
     /// <param name="cancellationToken">A token to cancel the operation.</param>
-    /// <returns>The created <see cref="KeyVaultKey"/>.</returns>
+    /// <returns>The created <see cref="KeyVaultKey"/>, or <see langword="null"/> if the key name is invalid.</returns>
     Task<KeyVaultKey> CreateRsaKeyAsync(CreateRsaKeyOptions options, CancellationToken cancellationToken = default);
 
     /// <summary>
@@ -40,7 +40,7 @@ public interface IKeyService
     /// </summary>
     /// <param name="options">The EC key creation options, including curve name.</param>
     /// <param name="cancellationToken">A token to cancel the operation.</param>
-    /// <returns>The created <see cref="KeyVaultKey"/>.</returns>
+    /// <returns>The created <see cref="KeyVaultKey"/>, or <see langword="null"/> if the key name is invalid.</returns>
     Task<KeyVaultKey> CreateEcKeyAsync(CreateEcKeyOptions options, CancellationToken cancellationToken = default);
 
     /// <summary>
@@ -49,7 +49,7 @@ public interface IKeyService
     /// <param name="properties">The key properties to update.</param>
     /// <param name="keyOperations">The permitted key operations to set, or <see langword="null"/> to leave unchanged.</param>
     /// <param name="cancellationToken">A token to cancel the operation.</param>
-    /// <returns>The updated <see cref="KeyVaultKey"/>.</returns>
+    /// <returns>The updated <see cref="KeyVaultKey"/>, or <see langword="null"/> if the key name is invalid.</returns>
     Task<KeyVaultKey> UpdateKeyPropertiesAsync(KeyProperties properties, IEnumerable<KeyOperation>? keyOperations = null, CancellationToken cancellationToken = default);
 
     /// <summary>
@@ -57,8 +57,8 @@ public interface IKeyService
     /// </summary>
     /// <param name="name">The name of the key to delete.</param>
     /// <param name="cancellationToken">A token to cancel the operation.</param>
-    /// <returns>The <see cref="DeletedKey"/> containing deletion information.</returns>
-    Task<DeletedKey> DeleteKeyAsync(string name, CancellationToken cancellationToken = default);
+    /// <returns>The <see cref="DeletedKey"/> containing deletion information, or <see langword="null"/> if the key name is invalid.</returns>
+    Task<DeletedKey?> DeleteKeyAsync(string name, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Lists the properties of all keys in the vault.
@@ -73,15 +73,15 @@ public interface IKeyService
     /// <param name="name">The name of the key.</param>
     /// <param name="cancellationToken">A token to cancel the operation.</param>
     /// <returns>An async enumerable of <see cref="KeyProperties"/> for each version.</returns>
-    IAsyncEnumerable<KeyProperties> GetPropertiesOfKeyVersionsAsync(string name, CancellationToken cancellationToken = default);
+    IAsyncEnumerable<KeyProperties>? GetPropertiesOfKeyVersionsAsync(string name, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Gets a deleted key, including its recovery information.
     /// </summary>
     /// <param name="name">The name of the deleted key.</param>
     /// <param name="cancellationToken">A token to cancel the operation.</param>
-    /// <returns>The <see cref="DeletedKey"/>.</returns>
-    Task<DeletedKey> GetDeletedKeyAsync(string name, CancellationToken cancellationToken = default);
+    /// <returns>The <see cref="DeletedKey"/>, or <see langword="null"/> if the key name is invalid.</returns>
+    Task<DeletedKey?> GetDeletedKeyAsync(string name, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Lists all deleted keys in the vault.
@@ -102,8 +102,8 @@ public interface IKeyService
     /// </summary>
     /// <param name="name">The name of the deleted key to recover.</param>
     /// <param name="cancellationToken">A token to cancel the operation.</param>
-    /// <returns>The recovered <see cref="KeyVaultKey"/>.</returns>
-    Task<KeyVaultKey> RecoverDeletedKeyAsync(string name, CancellationToken cancellationToken = default);
+    /// <returns>The recovered <see cref="KeyVaultKey"/>, or <see langword="null"/> if the key name is invalid.</returns>
+    Task<KeyVaultKey?> RecoverDeletedKeyAsync(string name, CancellationToken cancellationToken = default);
 
     // Sync operations
 
@@ -112,45 +112,45 @@ public interface IKeyService
     /// </summary>
     /// <param name="name">The name of the key.</param>
     /// <param name="version">The version of the key. If <see langword="null"/>, the latest version is retrieved.</param>
-    /// <returns>The <see cref="KeyVaultKey"/> with its key material and properties.</returns>
-    KeyVaultKey GetKey(string name, string? version = null);
+    /// <returns>The <see cref="KeyVaultKey"/> with its key material and properties, or <see langword="null"/> if the key name is invalid.</returns>
+    KeyVaultKey? GetKey(string name, string? version = null);
 
     /// <summary>
     /// Creates a new key of the specified type in the vault.
     /// </summary>
     /// <param name="name">The name of the key to create.</param>
     /// <param name="keyType">The type of key to create (e.g., RSA, EC).</param>
-    /// <returns>The created <see cref="KeyVaultKey"/>.</returns>
-    KeyVaultKey CreateKey(string name, KeyType keyType);
+    /// <returns>The created <see cref="KeyVaultKey"/>, or <see langword="null"/> if the key name is invalid.</returns>
+    KeyVaultKey? CreateKey(string name, KeyType keyType);
 
     /// <summary>
     /// Creates a new RSA key in the vault with the specified options.
     /// </summary>
     /// <param name="options">The RSA key creation options, including key size.</param>
-    /// <returns>The created <see cref="KeyVaultKey"/>.</returns>
-    KeyVaultKey CreateRsaKey(CreateRsaKeyOptions options);
+    /// <returns>The created <see cref="KeyVaultKey"/>, or <see langword="null"/> if the key name is invalid.</returns>
+    KeyVaultKey? CreateRsaKey(CreateRsaKeyOptions options);
 
     /// <summary>
     /// Creates a new elliptic curve key in the vault with the specified options.
     /// </summary>
     /// <param name="options">The EC key creation options, including curve name.</param>
-    /// <returns>The created <see cref="KeyVaultKey"/>.</returns>
-    KeyVaultKey CreateEcKey(CreateEcKeyOptions options);
+    /// <returns>The created <see cref="KeyVaultKey"/>, or <see langword="null"/> if the key name is invalid.</returns>
+    KeyVaultKey? CreateEcKey(CreateEcKeyOptions options);
 
     /// <summary>
     /// Updates the properties of a key without changing its cryptographic material.
     /// </summary>
     /// <param name="properties">The key properties to update.</param>
     /// <param name="keyOperations">The permitted key operations to set, or <see langword="null"/> to leave unchanged.</param>
-    /// <returns>The updated <see cref="KeyVaultKey"/>.</returns>
-    KeyVaultKey UpdateKeyProperties(KeyProperties properties, IEnumerable<KeyOperation>? keyOperations = null);
+    /// <returns>The updated <see cref="KeyVaultKey"/>, or <see langword="null"/> if the key name is invalid.</returns>
+    KeyVaultKey? UpdateKeyProperties(KeyProperties properties, IEnumerable<KeyOperation>? keyOperations = null);
 
     /// <summary>
     /// Deletes a key from the vault and waits for the operation to complete.
     /// </summary>
     /// <param name="name">The name of the key to delete.</param>
-    /// <returns>The <see cref="DeletedKey"/> containing deletion information.</returns>
-    DeletedKey DeleteKey(string name);
+    /// <returns>The <see cref="DeletedKey"/> containing deletion information, or <see langword="null"/> if the key name is invalid.</returns>
+    DeletedKey? DeleteKey(string name);
 
     /// <summary>
     /// Lists the properties of all keys in the vault.
@@ -162,15 +162,15 @@ public interface IKeyService
     /// Lists the properties of all versions of a key.
     /// </summary>
     /// <param name="name">The name of the key.</param>
-    /// <returns>An enumerable of <see cref="KeyProperties"/> for each version.</returns>
-    IEnumerable<KeyProperties> GetPropertiesOfKeyVersions(string name);
+    /// <returns>An enumerable of <see cref="KeyProperties"/> for each version, or <see langword="null"/> if the key name is invalid.</returns>
+    IEnumerable<KeyProperties>? GetPropertiesOfKeyVersions(string name);
 
     /// <summary>
     /// Gets a deleted key, including its recovery information.
     /// </summary>
     /// <param name="name">The name of the deleted key.</param>
-    /// <returns>The <see cref="DeletedKey"/>.</returns>
-    DeletedKey GetDeletedKey(string name);
+    /// <returns>The <see cref="DeletedKey"/>, or <see langword="null"/> if the key name is invalid.</returns>
+    DeletedKey? GetDeletedKey(string name);
 
     /// <summary>
     /// Lists all deleted keys in the vault.
@@ -188,6 +188,6 @@ public interface IKeyService
     /// Recovers a deleted key to its latest version and waits for the operation to complete.
     /// </summary>
     /// <param name="name">The name of the deleted key to recover.</param>
-    /// <returns>The recovered <see cref="KeyVaultKey"/>.</returns>
-    KeyVaultKey RecoverDeletedKey(string name);
+    /// <returns>The recovered <see cref="KeyVaultKey"/>, or <see langword="null"/> if the key name is invalid.</returns>
+    KeyVaultKey? RecoverDeletedKey(string name);
 }

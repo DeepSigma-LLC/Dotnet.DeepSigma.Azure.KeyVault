@@ -46,15 +46,25 @@ public class KeyService : IKeyService
     // Async operations
 
     /// <inheritdoc />
-    public async Task<KeyVaultKey> GetKeyAsync(string name, string? version = null, CancellationToken cancellationToken = default)
+    public async Task<KeyVaultKey?> GetKeyAsync(string name, string? version = null, CancellationToken cancellationToken = default)
     {
+        if(KeyVaultValidationService.IsValidKeyName(name) == false)
+        {
+            return null;
+        }
+
         Response<KeyVaultKey> response = await _client.GetKeyAsync(name, version, cancellationToken);
         return response.Value;
     }
 
     /// <inheritdoc />
-    public async Task<KeyVaultKey> CreateKeyAsync(string name, KeyType keyType, CancellationToken cancellationToken = default)
+    public async Task<KeyVaultKey?> CreateKeyAsync(string name, KeyType keyType, CancellationToken cancellationToken = default)
     {
+        if (KeyVaultValidationService.IsValidKeyName(name) == false)
+        {
+            return null;
+        }
+
         Response<KeyVaultKey> response = await _client.CreateKeyAsync(name, keyType, null, cancellationToken);
         return response.Value;
     }
@@ -81,8 +91,13 @@ public class KeyService : IKeyService
     }
 
     /// <inheritdoc />
-    public async Task<DeletedKey> DeleteKeyAsync(string name, CancellationToken cancellationToken = default)
+    public async Task<DeletedKey?> DeleteKeyAsync(string name, CancellationToken cancellationToken = default)
     {
+        if(KeyVaultValidationService.IsValidKeyName(name) == false)
+        {
+            return null;
+        }
+
         DeleteKeyOperation operation = await _client.StartDeleteKeyAsync(name, cancellationToken);
         Response<DeletedKey> response = await operation.WaitForCompletionAsync(cancellationToken);
         return response.Value;
@@ -95,14 +110,24 @@ public class KeyService : IKeyService
     }
 
     /// <inheritdoc />
-    public IAsyncEnumerable<KeyProperties> GetPropertiesOfKeyVersionsAsync(string name, CancellationToken cancellationToken = default)
+    public IAsyncEnumerable<KeyProperties>? GetPropertiesOfKeyVersionsAsync(string name, CancellationToken cancellationToken = default)
     {
+        if(KeyVaultValidationService.IsValidKeyName(name) == false)
+        {
+            return null;
+        }
+
         return _client.GetPropertiesOfKeyVersionsAsync(name, cancellationToken);
     }
 
     /// <inheritdoc />
-    public async Task<DeletedKey> GetDeletedKeyAsync(string name, CancellationToken cancellationToken = default)
+    public async Task<DeletedKey?> GetDeletedKeyAsync(string name, CancellationToken cancellationToken = default)
     {
+        if(KeyVaultValidationService.IsValidKeyName(name) == false)
+        {
+            return null;
+        }
+
         Response<DeletedKey> response = await _client.GetDeletedKeyAsync(name, cancellationToken);
         return response.Value;
     }
@@ -116,12 +141,22 @@ public class KeyService : IKeyService
     /// <inheritdoc />
     public async Task PurgeDeletedKeyAsync(string name, CancellationToken cancellationToken = default)
     {
+        if(KeyVaultValidationService.IsValidKeyName(name) == false)
+        {
+            throw new ArgumentException($"The key name '{name}' is not valid according to Azure Key Vault naming rules.", nameof(name));
+        }
+
         await _client.PurgeDeletedKeyAsync(name, cancellationToken);
     }
 
     /// <inheritdoc />
-    public async Task<KeyVaultKey> RecoverDeletedKeyAsync(string name, CancellationToken cancellationToken = default)
+    public async Task<KeyVaultKey?> RecoverDeletedKeyAsync(string name, CancellationToken cancellationToken = default)
     {
+        if(KeyVaultValidationService.IsValidKeyName(name) == false)
+        {
+            return null;
+        }
+
         RecoverDeletedKeyOperation operation = await _client.StartRecoverDeletedKeyAsync(name, cancellationToken);
         Response<KeyVaultKey> response = await operation.WaitForCompletionAsync(cancellationToken);
         return response.Value;
@@ -130,15 +165,25 @@ public class KeyService : IKeyService
     // Sync operations
 
     /// <inheritdoc />
-    public KeyVaultKey GetKey(string name, string? version = null)
+    public KeyVaultKey? GetKey(string name, string? version = null)
     {
+        if(KeyVaultValidationService.IsValidKeyName(name) == false)
+        {
+            return null;
+        }
+
         Response<KeyVaultKey> response = _client.GetKey(name, version);
         return response.Value;
     }
 
     /// <inheritdoc />
-    public KeyVaultKey CreateKey(string name, KeyType keyType)
+    public KeyVaultKey? CreateKey(string name, KeyType keyType)
     {
+        if (KeyVaultValidationService.IsValidKeyName(name) == false)
+        {
+            return null;
+        }
+
         Response<KeyVaultKey> response = _client.CreateKey(name, keyType, null);
         return response.Value;
     }
@@ -165,8 +210,13 @@ public class KeyService : IKeyService
     }
 
     /// <inheritdoc />
-    public DeletedKey DeleteKey(string name)
+    public DeletedKey? DeleteKey(string name)
     {
+        if(KeyVaultValidationService.IsValidKeyName(name) == false)
+        {
+            return null;
+        }
+
         DeleteKeyOperation operation = _client.StartDeleteKey(name);
         operation.WaitForCompletion();
         return operation.Value;
@@ -179,14 +229,24 @@ public class KeyService : IKeyService
     }
 
     /// <inheritdoc />
-    public IEnumerable<KeyProperties> GetPropertiesOfKeyVersions(string name)
+    public IEnumerable<KeyProperties>? GetPropertiesOfKeyVersions(string name)
     {
+        if (KeyVaultValidationService.IsValidKeyName(name) == false)
+        {
+            return null;
+        }
+
         return _client.GetPropertiesOfKeyVersions(name);
     }
 
     /// <inheritdoc />
-    public DeletedKey GetDeletedKey(string name)
+    public DeletedKey? GetDeletedKey(string name)
     {
+        if (KeyVaultValidationService.IsValidKeyName(name) == false)
+        {
+            return null;
+        }
+
         Response<DeletedKey> response = _client.GetDeletedKey(name);
         return response.Value;
     }
@@ -200,12 +260,22 @@ public class KeyService : IKeyService
     /// <inheritdoc />
     public void PurgeDeletedKey(string name)
     {
+        if(KeyVaultValidationService.IsValidKeyName(name) == false)
+        {
+            throw new ArgumentException($"The key name '{name}' is not valid according to Azure Key Vault naming rules.", nameof(name));
+        }
+        
         _client.PurgeDeletedKey(name);
     }
 
     /// <inheritdoc />
-    public KeyVaultKey RecoverDeletedKey(string name)
+    public KeyVaultKey? RecoverDeletedKey(string name)
     {
+        if(KeyVaultValidationService.IsValidKeyName(name) == false)
+        {
+            return null;
+        }
+
         RecoverDeletedKeyOperation operation = _client.StartRecoverDeletedKey(name);
         operation.WaitForCompletion();
         return operation.Value;

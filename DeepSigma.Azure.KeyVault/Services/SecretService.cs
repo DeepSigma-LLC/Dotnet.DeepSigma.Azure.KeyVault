@@ -46,22 +46,39 @@ public class SecretService : ISecretService
     // Async operations
 
     /// <inheritdoc />
-    public async Task<KeyVaultSecret> GetSecretAsync(string name, string? version = null, CancellationToken cancellationToken = default)
+    public async Task<KeyVaultSecret?> GetSecretAsync(string name, string? version = null, CancellationToken cancellationToken = default)
     {
+        bool isValidName = KeyVaultValidationService.IsValidSecretName(name);
+        if (!isValidName)
+        {
+            return null;
+        }
+
         Response<KeyVaultSecret> response = await _client.GetSecretAsync(name, version, cancellationToken);
         return response.Value;
     }
 
     /// <inheritdoc />
-    public async Task<string> GetSecretValueAsync(string name, CancellationToken cancellationToken = default)
+    public async Task<string?> GetSecretValueAsync(string name, CancellationToken cancellationToken = default)
     {
-        KeyVaultSecret secret = await GetSecretAsync(name, cancellationToken: cancellationToken);
-        return secret.Value;
+        if (KeyVaultValidationService.IsValidSecretName(name) == false)
+        {
+            return null;
+        }
+
+        KeyVaultSecret? secret = await GetSecretAsync(name, cancellationToken: cancellationToken);
+        return secret?.Value;
     }
 
-    /// <inheritdoc />
-    public async Task<KeyVaultSecret> SetSecretAsync(string name, string value, CancellationToken cancellationToken = default)
+    /// <inheritdoc cref="ISecretService.SetSecretAsync(string, string, CancellationToken)"/>
+    public async Task<KeyVaultSecret?> SetSecretAsync(string name, string value, CancellationToken cancellationToken = default)
     {
+        bool isValidName = KeyVaultValidationService.IsValidSecretName(name);
+        if (!isValidName)
+        {
+            return null;
+        }
+
         Response<KeyVaultSecret> response = await _client.SetSecretAsync(name, value, cancellationToken);
         return response.Value;
     }
@@ -74,8 +91,13 @@ public class SecretService : ISecretService
     }
 
     /// <inheritdoc />
-    public async Task<DeletedSecret> DeleteSecretAsync(string name, CancellationToken cancellationToken = default)
+    public async Task<DeletedSecret?> DeleteSecretAsync(string name, CancellationToken cancellationToken = default)
     {
+        if (KeyVaultValidationService.IsValidSecretName(name) == false)
+        {
+            return null;
+        }
+
         DeleteSecretOperation operation = await _client.StartDeleteSecretAsync(name, cancellationToken);
         Response<DeletedSecret> response = await operation.WaitForCompletionAsync(cancellationToken);
         return response.Value;
@@ -88,14 +110,24 @@ public class SecretService : ISecretService
     }
 
     /// <inheritdoc />
-    public IAsyncEnumerable<SecretProperties> GetPropertiesOfSecretVersionsAsync(string name, CancellationToken cancellationToken = default)
+    public IAsyncEnumerable<SecretProperties>? GetPropertiesOfSecretVersionsAsync(string name, CancellationToken cancellationToken = default)
     {
+        if (KeyVaultValidationService.IsValidSecretName(name) == false)
+        {
+            return null;
+        }
+
         return _client.GetPropertiesOfSecretVersionsAsync(name, cancellationToken);
     }
 
     /// <inheritdoc />
-    public async Task<DeletedSecret> GetDeletedSecretAsync(string name, CancellationToken cancellationToken = default)
+    public async Task<DeletedSecret?> GetDeletedSecretAsync(string name, CancellationToken cancellationToken = default)
     {
+        if (KeyVaultValidationService.IsValidSecretName(name) == false)
+        {
+            return null;
+        }
+    
         Response<DeletedSecret> response = await _client.GetDeletedSecretAsync(name, cancellationToken);
         return response.Value;
     }
@@ -109,12 +141,21 @@ public class SecretService : ISecretService
     /// <inheritdoc />
     public async Task PurgeDeletedSecretAsync(string name, CancellationToken cancellationToken = default)
     {
+        if(KeyVaultValidationService.IsValidSecretName(name) == false)
+        {
+            throw new ArgumentException("Invalid secret name.", nameof(name));
+        }
         await _client.PurgeDeletedSecretAsync(name, cancellationToken);
     }
 
     /// <inheritdoc />
-    public async Task<SecretProperties> RecoverDeletedSecretAsync(string name, CancellationToken cancellationToken = default)
+    public async Task<SecretProperties?> RecoverDeletedSecretAsync(string name, CancellationToken cancellationToken = default)
     {
+        if (KeyVaultValidationService.IsValidSecretName(name) == false)
+        {
+            return null;
+        }
+
         RecoverDeletedSecretOperation operation = await _client.StartRecoverDeletedSecretAsync(name, cancellationToken);
         Response<SecretProperties> response = await operation.WaitForCompletionAsync(cancellationToken);
         return response.Value;
@@ -123,21 +164,37 @@ public class SecretService : ISecretService
     // Sync operations
 
     /// <inheritdoc />
-    public KeyVaultSecret GetSecret(string name, string? version = null)
+    public KeyVaultSecret? GetSecret(string name, string? version = null)
     {
+        if (KeyVaultValidationService.IsValidSecretName(name) == false)
+        {
+            return null;
+        }
+
         Response<KeyVaultSecret> response = _client.GetSecret(name, version, CancellationToken.None);
         return response.Value;
     }
 
     /// <inheritdoc />
-    public string GetSecretValue(string name)
+    public string? GetSecretValue(string name)
     {
-        return GetSecret(name).Value;
+        if (KeyVaultValidationService.IsValidSecretName(name) == false) 
+        {
+            return null; 
+        }
+
+        KeyVaultSecret? secret = GetSecret(name);
+        return secret?.Value;
     }
 
     /// <inheritdoc />
-    public KeyVaultSecret SetSecret(string name, string value)
+    public KeyVaultSecret? SetSecret(string name, string value)
     {
+        if (KeyVaultValidationService.IsValidSecretName(name) == false)
+        {
+            return null;
+        }
+
         Response<KeyVaultSecret> response = _client.SetSecret(name, value);
         return response.Value;
     }
@@ -150,8 +207,13 @@ public class SecretService : ISecretService
     }
 
     /// <inheritdoc />
-    public DeletedSecret DeleteSecret(string name)
+    public DeletedSecret? DeleteSecret(string name)
     {
+        if(KeyVaultValidationService.IsValidSecretName(name) == false)
+        {
+            return null;
+        }
+
         DeleteSecretOperation operation = _client.StartDeleteSecret(name);
         operation.WaitForCompletion();
         return operation.Value;
@@ -164,14 +226,24 @@ public class SecretService : ISecretService
     }
 
     /// <inheritdoc />
-    public IEnumerable<SecretProperties> GetPropertiesOfSecretVersions(string name)
+    public IEnumerable<SecretProperties>? GetPropertiesOfSecretVersions(string name)
     {
+        if (KeyVaultValidationService.IsValidSecretName(name) == false)
+        {
+            return null;
+        }
+
         return _client.GetPropertiesOfSecretVersions(name);
     }
 
     /// <inheritdoc />
-    public DeletedSecret GetDeletedSecret(string name)
+    public DeletedSecret? GetDeletedSecret(string name)
     {
+        if (KeyVaultValidationService.IsValidSecretName(name) == false)
+        {
+            return null;
+        }
+
         Response<DeletedSecret> response = _client.GetDeletedSecret(name);
         return response.Value;
     }
@@ -185,12 +257,22 @@ public class SecretService : ISecretService
     /// <inheritdoc />
     public void PurgeDeletedSecret(string name)
     {
+        if(KeyVaultValidationService.IsValidSecretName(name) == false)
+        {
+            throw new ArgumentException("Invalid secret name.", nameof(name));
+        }
+        
         _client.PurgeDeletedSecret(name);
     }
 
     /// <inheritdoc />
-    public SecretProperties RecoverDeletedSecret(string name)
+    public SecretProperties? RecoverDeletedSecret(string name)
     {
+        if (KeyVaultValidationService.IsValidSecretName(name) == false)
+        {
+            return null;
+        }
+
         RecoverDeletedSecretOperation operation = _client.StartRecoverDeletedSecret(name);
         operation.WaitForCompletion();
         return operation.Value;

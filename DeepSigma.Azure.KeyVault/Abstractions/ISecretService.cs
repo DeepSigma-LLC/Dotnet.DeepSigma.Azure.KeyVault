@@ -15,16 +15,16 @@ public interface ISecretService
     /// <param name="name">The name of the secret.</param>
     /// <param name="version">The version of the secret. If <see langword="null"/>, the latest version is retrieved.</param>
     /// <param name="cancellationToken">A token to cancel the operation.</param>
-    /// <returns>The <see cref="KeyVaultSecret"/> with its value and properties.</returns>
-    Task<KeyVaultSecret> GetSecretAsync(string name, string? version = null, CancellationToken cancellationToken = default);
+    /// <returns>The <see cref="KeyVaultSecret"/> with its value and properties, or <see langword="null"/> if the secret name is invalid.</returns>
+    Task<KeyVaultSecret?> GetSecretAsync(string name, string? version = null, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Gets the value of a secret as a string.
     /// </summary>
     /// <param name="name">The name of the secret.</param>
     /// <param name="cancellationToken">A token to cancel the operation.</param>
-    /// <returns>The secret value as a string.</returns>
-    Task<string> GetSecretValueAsync(string name, CancellationToken cancellationToken = default);
+    /// <returns>The secret value as a string, or <see langword="null"/> if the secret name is invalid.</returns>
+    Task<string?> GetSecretValueAsync(string name, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Sets a secret in the vault, creating a new version if the secret already exists.
@@ -32,8 +32,8 @@ public interface ISecretService
     /// <param name="name">The name of the secret.</param>
     /// <param name="value">The value of the secret.</param>
     /// <param name="cancellationToken">A token to cancel the operation.</param>
-    /// <returns>The <see cref="KeyVaultSecret"/> that was set, including its properties.</returns>
-    Task<KeyVaultSecret> SetSecretAsync(string name, string value, CancellationToken cancellationToken = default);
+    /// <returns>The <see cref="KeyVaultSecret"/> that was set, including its properties, or <see langword="null"/> if the secret name is invalid.</returns>
+    Task<KeyVaultSecret?> SetSecretAsync(string name, string value, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Updates the properties of a secret without changing its value.
@@ -48,8 +48,8 @@ public interface ISecretService
     /// </summary>
     /// <param name="name">The name of the secret to delete.</param>
     /// <param name="cancellationToken">A token to cancel the operation.</param>
-    /// <returns>The <see cref="DeletedSecret"/> containing deletion information.</returns>
-    Task<DeletedSecret> DeleteSecretAsync(string name, CancellationToken cancellationToken = default);
+    /// <returns>The <see cref="DeletedSecret"/> containing deletion information, or <see langword="null"/> if the secret name is invalid.</returns>
+    Task<DeletedSecret?> DeleteSecretAsync(string name, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Lists the properties of all secrets in the vault.
@@ -64,15 +64,15 @@ public interface ISecretService
     /// <param name="name">The name of the secret.</param>
     /// <param name="cancellationToken">A token to cancel the operation.</param>
     /// <returns>An async enumerable of <see cref="SecretProperties"/> for each version.</returns>
-    IAsyncEnumerable<SecretProperties> GetPropertiesOfSecretVersionsAsync(string name, CancellationToken cancellationToken = default);
+    IAsyncEnumerable<SecretProperties>? GetPropertiesOfSecretVersionsAsync(string name, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Gets a deleted secret, including its recovery information.
     /// </summary>
     /// <param name="name">The name of the deleted secret.</param>
     /// <param name="cancellationToken">A token to cancel the operation.</param>
-    /// <returns>The <see cref="DeletedSecret"/>.</returns>
-    Task<DeletedSecret> GetDeletedSecretAsync(string name, CancellationToken cancellationToken = default);
+    /// <returns>The <see cref="DeletedSecret"/>, or <see langword="null"/> if the secret name is invalid.</returns>
+    Task<DeletedSecret?> GetDeletedSecretAsync(string name, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Lists all deleted secrets in the vault.
@@ -93,8 +93,8 @@ public interface ISecretService
     /// </summary>
     /// <param name="name">The name of the deleted secret to recover.</param>
     /// <param name="cancellationToken">A token to cancel the operation.</param>
-    /// <returns>The <see cref="SecretProperties"/> of the recovered secret.</returns>
-    Task<SecretProperties> RecoverDeletedSecretAsync(string name, CancellationToken cancellationToken = default);
+    /// <returns>The <see cref="SecretProperties"/> of the recovered secret, or <see langword="null"/> if the secret name is invalid.</returns>
+    Task<SecretProperties?> RecoverDeletedSecretAsync(string name, CancellationToken cancellationToken = default);
 
     // Sync operations
 
@@ -103,23 +103,23 @@ public interface ISecretService
     /// </summary>
     /// <param name="name">The name of the secret.</param>
     /// <param name="version">The version of the secret. If <see langword="null"/>, the latest version is retrieved.</param>
-    /// <returns>The <see cref="KeyVaultSecret"/> with its value and properties.</returns>
-    KeyVaultSecret GetSecret(string name, string? version = null);
+    /// <returns>The <see cref="KeyVaultSecret"/> with its value and properties, or <see langword="null"/> if the secret name is invalid.</returns>
+    KeyVaultSecret? GetSecret(string name, string? version = null);
 
     /// <summary>
     /// Gets the value of a secret as a string.
     /// </summary>
     /// <param name="name">The name of the secret.</param>
-    /// <returns>The secret value as a string.</returns>
-    string GetSecretValue(string name);
+    /// <returns>The secret value as a string, or <see langword="null"/> if the secret name is invalid.</returns>
+    string? GetSecretValue(string name);
 
     /// <summary>
     /// Sets a secret in the vault, creating a new version if the secret already exists.
     /// </summary>
     /// <param name="name">The name of the secret.</param>
     /// <param name="value">The value of the secret.</param>
-    /// <returns>The <see cref="KeyVaultSecret"/> that was set, including its properties.</returns>
-    KeyVaultSecret SetSecret(string name, string value);
+    /// <returns>The <see cref="KeyVaultSecret"/> that was set, including its properties, or <see langword="null"/> if the secret name is invalid.</returns>
+    KeyVaultSecret? SetSecret(string name, string value);
 
     /// <summary>
     /// Updates the properties of a secret without changing its value.
@@ -132,8 +132,8 @@ public interface ISecretService
     /// Deletes a secret from the vault and waits for the operation to complete.
     /// </summary>
     /// <param name="name">The name of the secret to delete.</param>
-    /// <returns>The <see cref="DeletedSecret"/> containing deletion information.</returns>
-    DeletedSecret DeleteSecret(string name);
+    /// <returns>The <see cref="DeletedSecret"/> containing deletion information, or <see langword="null"/> if the secret name is invalid.</returns>
+    DeletedSecret? DeleteSecret(string name);
 
     /// <summary>
     /// Lists the properties of all secrets in the vault.
@@ -145,15 +145,15 @@ public interface ISecretService
     /// Lists the properties of all versions of a secret.
     /// </summary>
     /// <param name="name">The name of the secret.</param>
-    /// <returns>An enumerable of <see cref="SecretProperties"/> for each version.</returns>
-    IEnumerable<SecretProperties> GetPropertiesOfSecretVersions(string name);
+    /// <returns>An enumerable of <see cref="SecretProperties"/> for each version, or <see langword="null"/> if the secret name is invalid.</returns>
+    IEnumerable<SecretProperties>? GetPropertiesOfSecretVersions(string name);
 
     /// <summary>
     /// Gets a deleted secret, including its recovery information.
     /// </summary>
     /// <param name="name">The name of the deleted secret.</param>
-    /// <returns>The <see cref="DeletedSecret"/>.</returns>
-    DeletedSecret GetDeletedSecret(string name);
+    /// <returns>The <see cref="DeletedSecret"/> or <see langword="null"/> if the secret name is invalid.</returns>
+    DeletedSecret? GetDeletedSecret(string name);
 
     /// <summary>
     /// Lists all deleted secrets in the vault.
@@ -171,6 +171,6 @@ public interface ISecretService
     /// Recovers a deleted secret to its latest version and waits for the operation to complete.
     /// </summary>
     /// <param name="name">The name of the deleted secret to recover.</param>
-    /// <returns>The <see cref="SecretProperties"/> of the recovered secret.</returns>
-    SecretProperties RecoverDeletedSecret(string name);
+    /// <returns>The <see cref="SecretProperties"/> of the recovered secret, or <see langword="null"/> if the secret name is invalid.</returns>
+    SecretProperties? RecoverDeletedSecret(string name);
 }
